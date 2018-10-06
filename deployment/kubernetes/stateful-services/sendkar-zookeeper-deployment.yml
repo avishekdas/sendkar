@@ -1,0 +1,44 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: sendkar-zookeeper
+  labels:
+    name: sendkar-zookeeper
+spec:
+  ports:
+  - port: 2181
+    targetPort: 2181
+  clusterIP: None
+  selector:
+    role: sendkar-zookeeper
+---
+apiVersion: apps/v1beta1
+kind: StatefulSet
+metadata:
+  name: sendkar-zookeeper
+spec:
+  serviceName: "zookeeper"
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        role: sendkar-zookeeper
+    spec:
+      terminationGracePeriodSeconds: 10
+      containers:
+        - name: sendkar-zookeeper
+          image: eventuateio/eventuateio-local-zookeeper:0.14.0
+          ports:
+              - containerPort: 2181
+          volumeMounts:
+            - name: sendkar-zookeeper-persistent-storage
+              mountPath: /usr/local/zookeeper-data
+  volumeClaimTemplates:
+  - metadata:
+      name: sendkar-zookeeper-persistent-storage
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 1Gi
+---

@@ -1,4 +1,4 @@
-package com.sendkar.upload;
+package com.sendkar.download;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

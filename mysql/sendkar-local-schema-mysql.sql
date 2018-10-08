@@ -50,3 +50,20 @@ ADD COLUMN `mobilenumber` BIGINT(10) NULL AFTER `emailverified`,
 ADD COLUMN `mobileotp` VARCHAR(10) NULL AFTER `mobilenumber`,
 ADD COLUMN `mobileverified` TINYINT NULL AFTER `mobileotp`;
 
+CREATE TABLE `sendkar`.`docuploadotp` (
+  `username` VARCHAR(15) NOT NULL,
+  `otp` VARCHAR(10) NULL,
+  PRIMARY KEY (`username`)
+  )ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  
+ALTER TABLE `sendkar`.`docuploadotp` 
+ADD COLUMN `created_at` datetime DEFAULT NULL AFTER `otp`,
+ADD COLUMN `updated_at` datetime DEFAULT NULL AFTER `created_at`;
+
+ALTER TABLE `sendkar`.`docuploadotp` 
+ADD COLUMN `id` BIGINT(20) NOT NULL AUTO_INCREMENT FIRST,
+DROP PRIMARY KEY,
+ADD PRIMARY KEY (`id`);
+
+
+

@@ -65,5 +65,14 @@ ADD COLUMN `id` BIGINT(20) NOT NULL AUTO_INCREMENT FIRST,
 DROP PRIMARY KEY,
 ADD PRIMARY KEY (`id`);
 
+CREATE TABLE `sendkar`.`docdownloadotp` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `username` varchar(15) NOT NULL,
+  `otp` varchar(10) DEFAULT NULL,
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
+
 
 

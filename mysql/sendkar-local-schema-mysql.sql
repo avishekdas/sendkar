@@ -74,5 +74,39 @@ CREATE TABLE `sendkar`.`docdownloadotp` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
 
+CREATE TABLE `sendkar`.`statuses` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `name` varchar(15) NOT NULL,
+  `description` varchar(50) DEFAULT NULL,
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
 
+CREATE TABLE `sendkar`.`user_statuses` (
+  `user_id` bigint(20) NOT NULL,
+  `status_id` bigint(20) NOT NULL,
+  PRIMARY KEY (`user_id`,`status_id`),
+  KEY `fk_user_statuses_id` (`status_id`),
+  CONSTRAINT `fk_user_statuses_status_id` FOREIGN KEY (`status_id`) REFERENCES `statuses` (`id`),
+  CONSTRAINT `fk_user_statuses_user_id` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE `sendkar`.`plans` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `name` varchar(15) NOT NULL,
+  `description` varchar(50) DEFAULT NULL,
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
+
+CREATE TABLE `sendkar`.`user_plans` (
+  `user_id` bigint(20) NOT NULL,
+  `plan_id` bigint(20) NOT NULL,
+  PRIMARY KEY (`user_id`,`plan_id`),
+  KEY `fk_user_plans_plan_id` (`plan_id`),
+  CONSTRAINT `fk_user_plans_plan_id` FOREIGN KEY (`plan_id`) REFERENCES `plans` (`id`),
+  CONSTRAINT `fk_user_plans_user_id` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

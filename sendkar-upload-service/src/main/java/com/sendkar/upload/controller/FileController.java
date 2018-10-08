@@ -1,8 +1,13 @@
 package com.sendkar.upload.controller;
 
+import com.sendkar.upload.exception.ResourceNotFoundException;
+import com.sendkar.upload.model.DocumentUploadOtp;
+import com.sendkar.upload.payload.OtpResponse;
 import com.sendkar.upload.payload.UploadFileResponse;
+import com.sendkar.upload.repository.OtpRepository;
 import com.sendkar.upload.security.CurrentUser;
 import com.sendkar.upload.security.UserPrincipal;
+import com.sendkar.upload.service.OtpService;
 import com.sendkar.upload.service.aws.s3.S3Services;
 import com.sendkar.upload.util.Utility;
 import org.slf4j.Logger;
@@ -26,7 +31,13 @@ public class FileController {
     private static final Logger logger = LoggerFactory.getLogger(FileController.class);
 
     @Autowired
+    private OtpRepository otpRepository;
+
+    @Autowired
     private S3Services s3Srvc;
+
+    @Autowired
+    private OtpService optSrvc;
 
     @PostMapping("/upload/self/file")
     @PreAuthorize("hasRole('USER')")
@@ -35,7 +46,8 @@ public class FileController {
         UploadFileResponse uploadResponse = new UploadFileResponse("File upload failed");
 
         //Fetch plan details
-        String planName = "default-plan"; //<TODO>
+        String planName = "default-plan";
+        //Validate plan <TODO>
         StringBuffer strBuff = new StringBuffer();
         strBuff.append(planName);
         strBuff.append("/");
@@ -71,25 +83,29 @@ public class FileController {
                                                  @RequestParam("username") String username,
                                                  @RequestParam("otp") String otp) {
         UploadFileResponse uploadResponse = new UploadFileResponse("File upload failed");
+        DocumentUploadOtp docUploadOtp = otpRepository.findByUsername(username)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("User name not found", "username", username)
+                );
+        if(otp != null && otp.equals(docUploadOtp.getOtp())) {
+            //Fetch plan details
+            String planName = "default-plan";
+            //Validate plan <TODO>
+            StringBuffer strBuff = new StringBuffer();
+            strBuff.append(planName);
+            strBuff.append("/");
+            strBuff.append(username);
+            strBuff.append("/");
 
-
-
-        //Fetch plan details
-        String planName = "default-plan"; //<TODO>
-        StringBuffer strBuff = new StringBuffer();
-        strBuff.append(planName);
-        strBuff.append("/");
-        strBuff.append(currentUser.getUsername());
-        strBuff.append("/");
-
-        try {
-            File file = Utility.convertMultiPartToFile(multipartFile);
-            String fileName = Utility.generateFileName(multipartFile);
-            strBuff.append(fileName);
-            s3Srvc.uploadFile(strBuff.toString(), file);
-            uploadResponse.setMessage("File uploaded successfully");
-        } catch (IOException e) {
-            logger.info("IOE Error Message: " + e.getMessage());
+            try {
+                File file = Utility.convertMultiPartToFile(multipartFile);
+                String fileName = Utility.generateFileName(multipartFile);
+                strBuff.append(fileName);
+                s3Srvc.uploadFile(strBuff.toString(), file);
+                uploadResponse.setMessage("File uploaded successfully");
+            } catch (IOException e) {
+                logger.info("IOE Error Message: " + e.getMessage());
+            }
         }
         return uploadResponse;
     }
@@ -104,5 +120,16 @@ public class FileController {
                 .stream()
                 .map(file -> uploadFileAssisted(currentUser, file, username, otp))
                 .collect(Collectors.toList());
+    }
+
+    @GetMapping("/upload/getdocuploadotp")
+    @PreAuthorize("hasRole('USER')")
+    public OtpResponse getMobileOtp(@CurrentUser UserPrincipal currentUser,
+                                    @RequestParam("username") String username) {
+        //Fetch plan details
+        String planName = "default-plan";
+        //Validate plan <TODO>
+        OtpResponse otpResponse = optSrvc.generateDocUploadOtp(username);
+        return otpResponse;
     }
 }

@@ -26,29 +26,44 @@ public class UserController {
 
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
-    @GetMapping("/user/me")
-    @PreAuthorize("hasRole('USER')")
-    public UserSummary getCurrentUser(@CurrentUser UserPrincipal currentUser) {
-        UserSummary userSummary = new UserSummary(currentUser.getId(), currentUser.getUsername(), currentUser.getName());
-        return userSummary;
+    @GetMapping("/user/getUser/{username}")
+    //@PreAuthorize("hasRole('USER')")
+    public UserProfile getUserDetails(@PathVariable String username) {
+
+        UserProfile userProfile = userSrvc.getUsrDetails(username);
+        return userProfile;
+    }
+
+    @GetMapping("/user/isActive/{username}")
+    //@PreAuthorize("hasRole('USER')")
+    public BooleanResponse isActive(@PathVariable String username) {
+
+        BooleanResponse response = new BooleanResponse(false);
+        UserProfile userProfile = userSrvc.getUsrDetails(username);
+        if(userProfile.getEmailverified() == 1L && userProfile.getMobileverified() == 1L &&
+                userProfile.getAddress() != null && !"".equalsIgnoreCase(userProfile.getAddress())) {
+            response.setStatus(true);
+        }
+
+        return response;
     }
 
     @GetMapping("/user/getMobileOtp")
-    @PreAuthorize("hasRole('USER')")
+    //@PreAuthorize("hasRole('USER')")
     public OtpResponse getMobileOtp(@CurrentUser UserPrincipal currentUser) {
         OtpResponse otpResponse = userSrvc.generateMobileOtp(currentUser);
         return otpResponse;
     }
 
     @GetMapping("/user/getEmailOtp")
-    @PreAuthorize("hasRole('USER')")
+  //  @PreAuthorize("hasRole('USER')")
     public OtpResponse getEmailOtp(@CurrentUser UserPrincipal currentUser) {
         OtpResponse otpResponse = userSrvc.generateEmailOtp(currentUser);
         return otpResponse;
     }
 
     @GetMapping("/user/verifyMobileOtp")
-    @PreAuthorize("hasRole('USER')")
+//    @PreAuthorize("hasRole('USER')")
     public ApiResponse verifyMobileOtp(@CurrentUser UserPrincipal currentUser,
                                        @RequestParam(value = "otp") String otp) {
         ApiResponse apiResponse = new ApiResponse(false, "Verification failed");
@@ -69,7 +84,7 @@ public class UserController {
     }
 
     @GetMapping("/user/verifyEmailOtp")
-    @PreAuthorize("hasRole('USER')")
+    //@PreAuthorize("hasRole('USER')")
     public ApiResponse verifyEmailOtp(@CurrentUser UserPrincipal currentUser,
                                       @RequestParam(value = "otp") String otp) {
         ApiResponse apiResponse = new ApiResponse(false, "Verification failed");
@@ -99,15 +114,5 @@ public class UserController {
     public UserIdentityAvailability checkEmailAvailability(@RequestParam(value = "email") String email) {
         Boolean isAvailable = !userRepository.existsByEmail(email);
         return new UserIdentityAvailability(isAvailable);
-    }
-
-    @GetMapping("/users/{username}")
-    public UserProfile getUserProfile(@PathVariable(value = "username") String username) {
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new ResourceNotFoundException("User", "username", username));
-
-        UserProfile userProfile = new UserProfile(user.getId(), user.getUsername(), user.getName(), user.getCreatedAt());
-
-        return userProfile;
     }
 }

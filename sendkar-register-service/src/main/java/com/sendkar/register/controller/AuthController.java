@@ -4,10 +4,7 @@ import com.sendkar.register.exception.AppException;
 import com.sendkar.register.model.Role;
 import com.sendkar.register.model.RoleName;
 import com.sendkar.register.model.User;
-import com.sendkar.register.payload.ApiResponse;
-import com.sendkar.register.payload.JwtAuthenticationResponse;
-import com.sendkar.register.payload.LoginRequest;
-import com.sendkar.register.payload.SignUpRequest;
+import com.sendkar.register.payload.*;
 import com.sendkar.register.repository.RoleRepository;
 import com.sendkar.register.repository.UserRepository;
 import com.sendkar.register.security.JwtTokenProvider;
@@ -18,6 +15,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -78,7 +76,8 @@ public class AuthController {
 
         // Creating user's account
         User user = new User(signUpRequest.getName(), signUpRequest.getUsername(),
-                signUpRequest.getEmail(), signUpRequest.getPassword(), signUpRequest.getMobilenumber());
+                signUpRequest.getEmail(), signUpRequest.getPassword(), signUpRequest.getMobilenumber()
+                , signUpRequest.getAddress());
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));
 
@@ -94,5 +93,37 @@ public class AuthController {
                 .buildAndExpand(result.getUsername()).toUri();
 
         return ResponseEntity.created(location).body(new ApiResponse(true, "User registered successfully"));
+    }
+
+    @PostMapping("/updateUser")
+    public ResponseEntity<?> updateUser(@Valid @RequestBody UserUpdateRequest updateRequest) {
+
+        User user = userRepository.findByUsernameOrEmail(updateRequest.getUsername(), updateRequest.getEmail())
+                .orElseThrow(() ->
+                        new UsernameNotFoundException("User not found with username : " + updateRequest.getUsername() +
+                                "or email : " + updateRequest.getEmail())
+                );
+
+        //<TODO> check if data can be removed
+        if(updateRequest.getAddress() != null && !"".equalsIgnoreCase(updateRequest.getAddress()))
+            user.setAddress(updateRequest.getAddress());
+        if(updateRequest.getMobilenumber() != null && updateRequest.getMobilenumber() != 0)
+            user.setMobilenumber(updateRequest.getMobilenumber());
+        if(updateRequest.getName() != null && !"".equalsIgnoreCase(updateRequest.getName()))
+            user.setName(updateRequest.getName());
+        if(updateRequest.getUsername() != null && !"".equalsIgnoreCase(updateRequest.getUsername()))
+            user.setUsername(updateRequest.getUsername());
+        if(updateRequest.getEmail() != null && !"".equalsIgnoreCase(updateRequest.getEmail()))
+            user.setEmail(updateRequest.getEmail());
+        if(updateRequest.getPassword() != null && !"".equalsIgnoreCase(updateRequest.getPassword()))
+            user.setPassword(passwordEncoder.encode(updateRequest.getPassword()));
+
+        User result = userRepository.save(user);
+
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentContextPath().path("/users/{username}")
+                .buildAndExpand(result.getUsername()).toUri();
+
+        return ResponseEntity.created(location).body(new ApiResponse(true, "User updated successfully"));
     }
 }

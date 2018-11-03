@@ -2,6 +2,7 @@ package com.sendkar.register.service;
 
 import com.sendkar.register.model.User;
 import com.sendkar.register.payload.OtpResponse;
+import com.sendkar.register.payload.UserProfile;
 import com.sendkar.register.repository.UserRepository;
 import com.sendkar.register.security.UserPrincipal;
 import com.sendkar.register.util.StringUtil;
@@ -58,5 +59,23 @@ public class UserService {
             new UsernameNotFoundException("User not found");
         }
         return otpResponse;
+    }
+
+    @Transactional
+    public UserProfile getUsrDetails(String usrName){
+        UserProfile usrProfile = null;
+        if(usrName != null) {
+            User user = userRepository.findByUsername(usrName)
+                    .orElseThrow(() ->
+                            new UsernameNotFoundException("User not found with username : " + usrName)
+                    );
+
+            usrProfile = new UserProfile(user.getId(), user.getUsername(), user.getName(),
+                    user.getAddress(), user.getEmail(), user.getMobilenumber(),
+                    user.getEmailverified(), user.getMobileverified());
+        } else {
+            new UsernameNotFoundException("User not found");
+        }
+        return usrProfile;
     }
 }

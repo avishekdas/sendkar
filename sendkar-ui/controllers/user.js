@@ -118,7 +118,7 @@ exports.postSignup = (req, res, next) => {
 		headers: { "Content-Type": "application/json" }
 	};
 	 
-	client.post("http://127.0.0.1:8081/api/auth/signup", args, function (data, response) {
+	client.post("http://13.127.116.83:8081/api/auth/signup", args, function (data, response) {
 		// raw response
 		//console.log(response);
 	});
@@ -182,7 +182,7 @@ exports.postUpdateProfile = (req, res, next) => {
 		headers: { "Content-Type": "application/json" }
 	};
 	 
-	client.post("http://127.0.0.1:8081/api/auth/updateUser", args, function (data, response) {
+	client.post("http://13.127.116.83:8081/api/auth/updateUser", args, function (data, response) {
 		// raw response
 		//console.log(response);
 	});

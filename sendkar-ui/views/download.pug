@@ -9,46 +9,81 @@ block content
     .form-group.row
       label(class='col-md-2 col-form-label font-weight-bold', for='receivermobilenumber') Recipient Mobile #
       .col-md-2
-        input.form-control(type='number', name='receivermobilenumber', id='receivermobilenumber')
+        input.form-control(type='number', name='receivermobilenumber', id='receivermobilenumber', autofocus=true)
     .form-group
       .offset-md-2.col-md-8.p-1
-        button#btnSubmit.btn.btn-primary(type='submit') Retrieve
+        input#btnSubmit.button(name='btnSubmit', type='button', value='Retrieve')
     table#main_table(align='center', border='1', hidden='')
 
     script(src="/js/jquery-3.3.1.min.js")
     script(type="text/javascript").
       $(document).ready( () => {
+        var th = '<th>Document Id</th><th>Document Name</th><th>Enter OTP</th><th>Action</th>';
+        $('#main_table').append(th);
         $("#btnSubmit").click((event) => {
           //stop submit the form, we will post it manually.
-          event.preventDefault();
+          //event.preventDefault();
           fetchDocuments();
-        });		
+        });
       });
-	  
+      
       function fetchDocuments() {
-        var form = $('#applicationForm')[0];
-        var data = new FormData(form);
-        var docurl = "http://127.0.0.1:8083/api/download/getdocumentlist/";
-        docurl = docurl + $('#receivermobilenumber').val();
-        alert(docurl);
+        $('#main_table').prop('hidden', false);
+        $("#main_table").find("tr").remove();
+        var docurl = '/getdocuments?receivermobilenumber=' + $("#receivermobilenumber").val();
         $.ajax({
           type: "GET",
           url: docurl,
-          data: data,
-          processData: false,
-          contentType: false,
-          cache: false,
-          success: (data) => {
-            document.getElementById("main_table").innerHTML = "";
-            var th = '<th>File Name</th><th>OTP</th><th></th>';
-            $('#main_table').append(th);
-            var tr;
-            //$.each(data, function(key, documentobj) {
-              alert(data);
-            //}
-          },
-          error: (e) => {
-            alert(e.responseText);
-          }
+          dataType:"json",
+          success: (result) => {
+            if(result.indexOf("Un-authorize") === -1){
+              $.each(result, function( key, data ) {
+               tr = $('<tr/>');
+               tr.append("<td>" + data.id + "</td>");
+               tr.append("<td>" + data.filename + "</td>");
+               
+               //var hiddenid = $("<input type=\"hidden\" id=\"id_" + data.id + "\" name=\"id_" + data.id + "\ value=\"" + data.id + "\" />");
+               var otpfield = $("<input type=\"text\" id=\"otp_" + data.id + "\" name=\"otp_" + data.id + "\" />");
+               var column = $('<td></td>');
+               column.append(otpfield);
+               tr.append(column);
+               
+               //var clickme = $("<input type=\"button\" value=\"Fetch\" name=\"btnFetch\" />");
+               var clickme = $('<input />', {
+                  type  : 'button',
+                  value : 'Fetch',
+                  id    : 'btnFetch',
+                  name  : 'btnFetch',
+                  on    : {
+                     click: function() {
+                         fetchDocument(data.id);
+                     }
+                  }
+               });
+               column = $('<td></td>');
+               column.append(clickme);
+               tr.append(column);
+               $('#main_table').append(tr);
+              })
+            }
+        }
+       });
+      }
+      
+      function fetchDocument(docid) {
+        var table = $('#main_table');
+        var tempdocid = '';
+        var otp = '';
+        table.find('tr').each(function (i) {
+            var $tds = $(this).find('td');
+            tempdocid = $tds.eq(0).text();
+            if(tempdocid.match(docid)) {
+                $(this).closest('tr').find("input:not([name^=btnFetch])").each(function() {
+                    otp = this.value;
+                });
+            }
         });
+        
+        var docurl = '/getdocument?docid=' + docid + '&otp=' + otp;
+        location.href = docurl;
       }

@@ -143,6 +143,8 @@ app.post('/contact', contactController.postContact);
 app.get('/upload', passportConfig.isAuthenticated, uploadController.getUpload);
 app.post('/upload', passportConfig.isAuthenticated, upload.single('file'), uploadController.postUpload);
 app.get('/download', passportConfig.isAuthenticated, downloadController.getDownload);
+app.get('/getdocuments', passportConfig.isAuthenticated, downloadController.getDocList);
+app.get('/getdocument', passportConfig.isAuthenticated, downloadController.getDocument);
 app.post('/download', passportConfig.isAuthenticated, downloadController.postDownload);
 app.get('/account', passportConfig.isAuthenticated, userController.getAccount);
 app.post('/account/profile', passportConfig.isAuthenticated, userController.postUpdateProfile);

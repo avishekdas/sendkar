@@ -1,4 +1,6 @@
-const nodemailer = require('nodemailer');
+const Client = require('node-rest-client').Client;
+var client = new Client();
+var url = require('url');
 
 /**
  * GET /download
@@ -13,18 +15,82 @@ exports.getDownload = (req, res) => {
   });
 };
 
+exports.getDocList = (req, res) => {
+	var query = url.parse(req.url,true).query;
+	var string = JSON.stringify(query);
+	var objectValue = JSON.parse(string);
+	
+	console.log(objectValue['receivermobilenumber']);
+	if(objectValue['receivermobilenumber'] === '') {
+		const errors = 'Receipient Mobile number missing';
+		if (errors) {
+			req.flash('errors', errors);
+			return res.redirect('/download');
+		}
+	}
+  
+  	//Call api
+	var docurl = "http://13.232.119.17:8083/api/download/getdocumentlist/";
+    docurl = docurl + objectValue['receivermobilenumber'];
+	 
+	client.get(docurl, function (data, response) {
+		var resources = [];
+		for(var i = 0; i < data.length; i++) {
+			console.log(data[i].filename);
+			var resource = new Object();
+			resource.id = data[i].id;
+			resource.filename = data[i].filename;
+			resources.push(resource);		
+		};
+		res.send(JSON.stringify(resources));
+	});
+};
+
+exports.getDocument = (req, res) => {
+	var query = url.parse(req.url,true).query;
+	var string = JSON.stringify(query);
+	var objectValue = JSON.parse(string);
+	
+	console.log(objectValue['docid']);
+    console.log(objectValue['otp']);
+	if(objectValue['docid'] === '') {
+		const errors = 'Receipient Mobile number missing';
+		if (errors) {
+			req.flash('errors', errors);
+			return res.redirect('/download');
+		}
+	}
+  
+  	//Call api
+	var docurl = "http://13.232.119.17:8083/api/download/assisted/file/";
+    docurl = docurl + objectValue['docid'];
+    docurl = docurl + "/" + objectValue['otp'];
+    console.log(docurl);
+	 
+	client.get(docurl, function (data, response) {
+        var fileName;
+        var contenttype = response.headers['content-type'];
+        var contentdisposition = response.headers['content-disposition']
+        var filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
+        var matches = filenameRegex.exec(contentdisposition);
+        if (matches != null && matches[1]) {
+            fileName = matches[1].replace(/['"]/g, '');
+        }
+        
+		res.setHeader('Content-Type',contenttype);
+		res.setHeader("Content-Disposition","attachment;filename="+fileName);
+		res.end(data,'binary');
+	});
+};
+
 /**
  * POST /download
  * Send a contact form via Nodemailer.
  */
 exports.postDownload = (req, res) => {
-  let fromName;
-  let fromEmail;
   if (!req.user) {
-    req.assert('name', 'Name cannot be blank').notEmpty();
-    req.assert('email', 'Email is not valid').isEmail();
+    req.assert('receivermobilenumber', 'Mobile # cannot be blank').notEmpty();
   }
-  req.assert('message', 'Message cannot be blank').notEmpty();
 
   const errors = req.validationErrors();
 
@@ -32,62 +98,22 @@ exports.postDownload = (req, res) => {
     req.flash('errors', errors);
     return res.redirect('/download');
   }
-
-  if (!req.user) {
-    fromName = req.body.name;
-    fromEmail = req.body.email;
-  } else {
-    fromName = req.user.profile.name || '';
-    fromEmail = req.user.email;
-  }
-
-  let transporter = nodemailer.createTransport({
-    service: 'SendGrid',
-    auth: {
-      user: process.env.SENDGRID_USER,
-      pass: process.env.SENDGRID_PASSWORD
-    }
-  });
-  const mailOptions = {
-    to: 'your@email.com',
-    from: `${fromName} <${fromEmail}>`,
-    subject: 'Contact Form | Sendkar',
-    text: req.body.message
-  };
-
-  return transporter.sendMail(mailOptions)
-    .then(() => {
-      req.flash('success', { msg: 'Email has been sent successfully!' });
-      res.redirect('/download');
-    })
-    .catch((err) => {
-      if (err.message === 'self signed certificate in certificate chain') {
-        console.log('WARNING: Self signed certificate in certificate chain. Retrying with the self signed certificate. Use a valid certificate if in production.');
-        transporter = nodemailer.createTransport({
-          service: 'SendGrid',
-          auth: {
-            user: process.env.SENDGRID_USER,
-            pass: process.env.SENDGRID_PASSWORD
-          },
-          tls: {
-            rejectUnauthorized: false
-          }
-        });
-        return transporter.sendMail(mailOptions);
-      }
-      console.log('ERROR: Could not send contact email after security downgrade.\n', err);
-      req.flash('errors', { msg: 'Error sending the message. Please try again shortly.' });
-      return false;
-    })
-    .then((result) => {
-      if (result) {
-        req.flash('success', { msg: 'Email has been sent successfully!' });
-        return res.redirect('/download');
-      }
-    })
-    .catch((err) => {
-      console.log('ERROR: Could not send contact email.\n', err);
-      req.flash('errors', { msg: 'Error sending the message. Please try again shortly.' });
-      return res.redirect('/download');
-    });
+  
+  	//Call api
+	var docurl = "http://13.232.119.17:8083/api/download/getdocumentlist/";
+    docurl = docurl + req.body.receivermobilenumber;
+	 
+	client.get(docurl, function (data, response) {
+		//console.log(data);
+		//console.log(response);
+		var resources = [];
+		data.forEach(function(doc) {
+			console.log(doc.filename);
+			var resource = new Object();
+			resource.id = doc.id;
+			resource.filename = doc.filename;
+			resources.push(resource);		
+		});
+		res.send(JSON.stringify(resources));
+	});
 };

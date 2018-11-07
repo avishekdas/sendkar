@@ -1,0 +1,54 @@
+extends layout
+
+block content
+  .pb-2.mt-2.mb-4.border-bottom
+    h3 Send Document
+
+  form(enctype='multipart/mixed', method='POST', id="applicationForm")
+    input(type='hidden', name='_csrf', value=_csrf)
+    .form-group.row
+      label(class='col-md-2 col-form-label font-weight-bold', for='receivermobilenumber') Recipient Mobile #
+      .col-md-2
+        input.form-control(type='number', name='receivermobilenumber', id='receivermobilenumber')
+    .form-group
+      .offset-md-2.col-md-8.p-1
+        button#btnSubmit.btn.btn-primary(type='submit') Retrieve
+    table#main_table(align='center', border='1', hidden='')
+
+    script(src="/js/jquery-3.3.1.min.js")
+    script(type="text/javascript").
+      $(document).ready( () => {
+        $("#btnSubmit").click((event) => {
+          //stop submit the form, we will post it manually.
+          event.preventDefault();
+          fetchDocuments();
+        });		
+      });
+	  
+      function fetchDocuments() {
+        var form = $('#applicationForm')[0];
+        var data = new FormData(form);
+        var docurl = "http://127.0.0.1:8083/api/download/getdocumentlist/";
+        docurl = docurl + $('#receivermobilenumber').val();
+        alert(docurl);
+        $.ajax({
+          type: "GET",
+          url: docurl,
+          data: data,
+          processData: false,
+          contentType: false,
+          cache: false,
+          success: (data) => {
+            document.getElementById("main_table").innerHTML = "";
+            var th = '<th>File Name</th><th>OTP</th><th></th>';
+            $('#main_table').append(th);
+            var tr;
+            //$.each(data, function(key, documentobj) {
+              alert(data);
+            //}
+          },
+          error: (e) => {
+            alert(e.responseText);
+          }
+        });
+      }

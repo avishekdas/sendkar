@@ -1,0 +1,81 @@
+extends layout
+
+block content
+  .pb-2.mt-2.mb-4.border-bottom
+    h3 Send Document
+
+  form(enctype='multipart/mixed', method='POST', id="applicationForm")
+    input(type='hidden', name='_csrf', value=_csrf)
+    input(type='hidden', name='uploadername', id='uploadername', value=user.email)
+    .form-group.row
+      label(class='col-md-2 col-form-label font-weight-bold', for='sendermobilenumber') Sender Mobile #
+      .col-md-2
+        input.form-control(type='number', name='sendermobilenumber', id='sendermobilenumber', autofocus=true)
+      label(class='col-md-2 col-form-label font-weight-bold', for='receivermobilenumber') Recipient Mobile #
+      .col-md-2
+        input.form-control(type='number', name='receivermobilenumber', id='receivermobilenumber')
+    .form-group.row
+      label(class='col-md-2 col-form-label font-weight-bold', for='senderaddress') Sender Address
+      .col-md-8
+        input.form-control(type='text', name='senderaddress', id='senderaddress', autocomplete='senderaddress')
+    .form-group.row
+      label(class='col-md-2 col-form-label font-weight-bold', for='receiveraddress') Recipient Address
+      .col-md-8
+        input.form-control(type='text', name='receiveraddress', id='receiveraddress')
+    .form-group.row
+      label(class='col-md-2 col-form-label font-weight-bold', for='file') Document
+      .col-md-6
+        input.form-control(type='file', name='file', id='file')
+    .form-group.row
+      label(class='col-md-2 col-form-label font-weight-bold', for='message') Message for recipient if any
+      .col-md-8
+        textarea.form-control(name='message', id='message', rows='4')
+    .form-group
+      .offset-md-2.col-md-8.p-1
+        button#btnSubmit.btn.btn-primary(type='submit')
+          i.far.fa-envelope.fa-sm
+          | Send
+
+    script(src="/js/jquery-3.3.1.min.js")
+    script(type="text/javascript").
+      $(document).ready( () => {
+        $("#file").change(function() {
+          var val = $(this).val();
+          switch(val.substring(val.lastIndexOf('.') + 1).toLowerCase()){
+           case 'gif': case 'jpg': case 'png': case 'pdf': case 'jpeg':
+             //alert("an image");
+             break;
+           default:
+             $(this).val('');
+             // error message here
+             alert("not an allowable format");
+             $("#file").val ='';
+             break;
+          }
+        });
+        $("#btnSubmit").click((event) => {
+          //stop submit the form, we will post it manually.
+          event.preventDefault();
+          doAjax();
+        });		
+      });
+	  
+      function doAjax() {
+        var form = $('#applicationForm')[0];
+        var data = new FormData(form);
+        $.ajax({
+          type: "POST",
+          enctype: 'multipart/form-data',
+          url: "http://127.0.0.1:8082/api/upload/assisted/file",
+          data: data,
+          processData: false,
+          contentType: false,
+          cache: false,
+          success: (data) => {
+            alert("Document send successfully");
+          },
+          error: (e) => {
+            alert(e.responseText);
+          }
+        });
+      }

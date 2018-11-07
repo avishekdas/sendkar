@@ -1,9 +1,9 @@
 package com.sendkar.download.service;
 
-import com.sendkar.download.model.DocumentDownloadOtp;
-import com.sendkar.download.model.User;
+import com.sendkar.download.exception.ResourceNotFoundException;
+import com.sendkar.download.model.Document;
 import com.sendkar.download.payload.OtpResponse;
-import com.sendkar.download.repository.OtpRepository;
+import com.sendkar.download.repository.DocumentRepository;
 import com.sendkar.download.repository.UserRepository;
 import com.sendkar.download.util.StringUtil;
 import org.slf4j.Logger;
@@ -19,27 +19,26 @@ public class OtpService {
     private static final Logger logger = LoggerFactory.getLogger(OtpService.class);
 
     @Autowired
-    OtpRepository otpRepository;
+    DocumentRepository documentRepository;
 
     @Autowired
     UserRepository userRepository;
 
     @Transactional
-    public OtpResponse generateDocDownloadOtp(String username){
+    public OtpResponse generateDocOtp(Long docId){
         OtpResponse otpResponse = null;
-        if(username != null) {
-            User user = userRepository.findByUsernameOrEmail(username, username)
+        if(docId != null) {
+            Document document = documentRepository.findById(docId)
                     .orElseThrow(() ->
-                            new UsernameNotFoundException("User not found with username or email : " + username)
+                            new ResourceNotFoundException("Document", "Document Id", docId)
                     );
-
             char[] otp = StringUtil.generateOTP(4);
             otpResponse = new OtpResponse(String.valueOf(otp));
-
-            DocumentDownloadOtp docDownloadOtp = new DocumentDownloadOtp(username, otpResponse.getOtp());
-
+            if(document != null){
+                document.setOtp(otpResponse.getOtp());
+            }
             //Send otp <TODO>
-            otpRepository.saveAndFlush(docDownloadOtp);
+            documentRepository.saveAndFlush(document);
         } else {
             new UsernameNotFoundException("User not found");
         }

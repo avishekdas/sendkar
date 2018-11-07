@@ -1,14 +1,14 @@
 package com.sendkar.upload.controller;
 
-import com.sendkar.upload.exception.ResourceNotFoundException;
-import com.sendkar.upload.model.DocumentUploadOtp;
+import com.sendkar.upload.model.Document;
 import com.sendkar.upload.payload.OtpResponse;
 import com.sendkar.upload.payload.UploadFileResponse;
-import com.sendkar.upload.repository.OtpRepository;
+import com.sendkar.upload.repository.DocumentRepository;
 import com.sendkar.upload.security.CurrentUser;
 import com.sendkar.upload.security.UserPrincipal;
 import com.sendkar.upload.service.OtpService;
 import com.sendkar.upload.service.aws.s3.S3Services;
+import com.sendkar.upload.util.StringUtil;
 import com.sendkar.upload.util.Utility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
@@ -31,7 +30,7 @@ public class FileController {
     private static final Logger logger = LoggerFactory.getLogger(FileController.class);
 
     @Autowired
-    private OtpRepository otpRepository;
+    private DocumentRepository documentRepository;
 
     @Autowired
     private S3Services s3Srvc;
@@ -77,24 +76,25 @@ public class FileController {
     }
 
     @PostMapping("/upload/assisted/file")
-    @PreAuthorize("hasRole('USER')")
-    public UploadFileResponse uploadFileAssisted(@CurrentUser UserPrincipal currentUser,
-                                                 @RequestParam("file") MultipartFile multipartFile,
-                                                 @RequestParam("username") String username,
-                                                 @RequestParam("otp") String otp) {
+//    @PreAuthorize("hasRole('USER')")
+    public UploadFileResponse uploadFileAssisted(@RequestParam("file") MultipartFile multipartFile,
+                                                 @RequestParam("uploadername") String uploadername,
+                                                 @RequestParam("sendermobilenumber") String sendermobilenumber,
+                                                 @RequestParam("receivermobilenumber") String receivermobilenumber,
+                                                 @RequestParam("senderaddress") String senderaddress,
+                                                 @RequestParam("receiveraddress") String receiveraddress,
+                                                 @RequestParam("message") String message) {
         UploadFileResponse uploadResponse = new UploadFileResponse("File upload failed");
-        DocumentUploadOtp docUploadOtp = otpRepository.findByUsername(username)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("User name not found", "username", username)
-                );
-        if(otp != null && otp.equals(docUploadOtp.getOtp())) {
+        StringBuffer otp = new StringBuffer();
+        otp.append(StringUtil.generateOTP(4));
+        if(otp != null && !"".equalsIgnoreCase(otp.toString())) {
             //Fetch plan details
             String planName = "default-plan";
             //Validate plan <TODO>
             StringBuffer strBuff = new StringBuffer();
             strBuff.append(planName);
             strBuff.append("/");
-            strBuff.append(username);
+            strBuff.append(receivermobilenumber);
             strBuff.append("/");
 
             try {
@@ -102,7 +102,18 @@ public class FileController {
                 String fileName = Utility.generateFileName(multipartFile);
                 strBuff.append(fileName);
                 s3Srvc.uploadFile(strBuff.toString(), file);
+
+                Long sendermobilenumberLong = Long.parseLong(sendermobilenumber);
+                Long receivermobilenumberLong = Long.parseLong(receivermobilenumber);
+
+                Document document = new Document(uploadername, multipartFile.getOriginalFilename(), otp.toString(),
+                        sendermobilenumberLong, receivermobilenumberLong,
+                        senderaddress, receiveraddress, message);
+
+                documentRepository.saveAndFlush(document);
+
                 uploadResponse.setMessage("File uploaded successfully");
+
             } catch (IOException e) {
                 logger.info("IOE Error Message: " + e.getMessage());
             }
@@ -110,7 +121,7 @@ public class FileController {
         return uploadResponse;
     }
 
-    @PostMapping("/upload/assisted/multiplefiles")
+    /*@PostMapping("/upload/assisted/multiplefiles")
     @PreAuthorize("hasRole('USER')")
     public List<UploadFileResponse> uploadMultipleFilesAssisted(@CurrentUser UserPrincipal currentUser,
                                                                 @RequestParam("files") MultipartFile[] files,
@@ -120,16 +131,16 @@ public class FileController {
                 .stream()
                 .map(file -> uploadFileAssisted(currentUser, file, username, otp))
                 .collect(Collectors.toList());
-    }
+    }*/
 
-    @GetMapping("/upload/getdocuploadotp")
-    @PreAuthorize("hasRole('USER')")
-    public OtpResponse getMobileOtp(@CurrentUser UserPrincipal currentUser,
-                                    @RequestParam("username") String username) {
+    @GetMapping("/upload/getdocumentotp")
+//    @PreAuthorize("hasRole('USER')")
+    public OtpResponse getMobileOtp(@RequestParam("id") String docId) {
         //Fetch plan details
         String planName = "default-plan";
         //Validate plan <TODO>
-        OtpResponse otpResponse = optSrvc.generateDocUploadOtp(username);
+        Long docIdLong = Long.parseLong(docId);
+        OtpResponse otpResponse = optSrvc.generateDocOtp(docIdLong);
         return otpResponse;
     }
 }

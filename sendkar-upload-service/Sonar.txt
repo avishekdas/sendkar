@@ -1,0 +1,101 @@
+postgres /var/lib/postgresql/10/main /var/log/postgresql/postgresql-10-main.log
+Credentials - postgres / postgres
+sonar / zaq1@wsx
+sonarqube / zaq1@wsx
+admin / bgt5^yhn
+avishek.d / zaq12wsx
+
+jenkins / zaq1@wsx
+
+jenkins url - 
+avishekd / bgt5^yhn
+
+sudo service apache2 start
+
+Jenkins -
+BX0ZQwGcUiyMlkFJgMgAAF80VKAVgWUBTnCKxeQI
+
+#!/bin/bash
+curl http://test-server:8080/buildByToken/build?job=hello-django-trunk&token=xZrJ5WsSfJkGpNsriOlY4PtQ7hC5olzDhNE
+
+Jenkins server QA - 
+root / cde3$rfv
+
+Docker
+=========
+server QA - 
+root / cde3$rfv
+
+docker user -
+dockeruser / dockeruser
+
+docker private repo
+nginx
+avishekd / avishekd
+
+dockerregistry.abpweddings.com
+curl -k https://avishekd:avishekd@dockerregistry.abpweddings.com:443/v2/
+
+curl http://avishekd:avishekd@localhost:5043/v2/
+
+/etc/systemd/system/docker-registry.service
+check status -  sudo systemctl status docker-registry
+start - sudo systemctl start docker-registry
+stop - sudo systemctl stop docker-registry
+check log - sudo journalctl -f -n 1000 -u docker-registry
+
+
+Liferay Dev -
+10.132.100.82
+jenkins / jenkins
+
+/opt/jdk/jdk1.7.0_80
+
+
+To start app automatically when system starts -
+pm2 startup systemd 
+
+to start app -
+pm2 start hello.js
+
+pm2 stop app_name_or_id
+pm2 restart app_name_or_id
+pm2 list
+pm2 info example
+pm2 monit
+
+
+ ──────────┬────┬──────┬──────┬────────┬─────────┬────────┬─────┬───────────┬──────┬──────────┐
+│ App name │ id │ mode │ pid  │ status │ restart │ uptime │ cpu │ mem       │ user │ watching │
+├──────────┼────┼──────┼──────┼────────┼─────────┼────────┼─────┼───────────┼──────┼──────────┤
+│ server   │ 0  │ fork │ 1334 │ online │ 0       │ 0s     │ 0%  │ 17.2 MB   │ root │ disabled
+
+ Start and Daemonize any application:
+                $ pm2 start app.js
+
+                Load Balance 4 instances of api.js:
+                $ pm2 start api.js -i 4
+
+                Monitor in production:
+                $ pm2 monitor
+
+                Make pm2 auto-boot at server restart:
+                $ pm2 startup
+
+                To go further checkout:
+                http://pm2.io/
+				
+[PM2] Freeze a process list on reboot via:
+$ pm2 save
+
+[PM2] Remove init script via:
+$ pm2 unstartup systemd
+
+
+Services QA server -
+10.132.100.92
+
+
+https://dzone.com/articles/deploying-spring-boot-on-docker
+docker build -f DockerFile -t dockerdemo .
+docker run -p 8080:8080 dockerdemo

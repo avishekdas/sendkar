@@ -26,39 +26,36 @@ public class S3ServicesImpl implements S3Services {
     private String bucketName;
 
     @Override
-    public String downloadFile(String keyName) {
-
-        StringBuffer strBuff = new StringBuffer();
+    public ByteArrayOutputStream downloadFile(String keyName) {
         try {
-
-            logger.info("Downloading an object");
             S3Object s3object = s3client.getObject(new GetObjectRequest(bucketName, keyName));
-            logger.info("Content-Type: "  + s3object.getObjectMetadata().getContentType());
-//            Utility.displayText(s3object.getObjectContent());
-            InputStream input = s3object.getObjectContent();
-            BufferedReader reader = new BufferedReader(new InputStreamReader(input));
-            String line = null;
-            while ((line = reader.readLine()) != null) {
-                strBuff.append(line);
+
+            InputStream is = s3object.getObjectContent();
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            int len;
+            byte[] buffer = new byte[4096];
+            while ((len = is.read(buffer, 0, buffer.length)) != -1) {
+                baos.write(buffer, 0, len);
             }
 
-            logger.info("===================== Import File - Done! =====================");
-
+            return baos;
+        } catch (IOException ioe) {
+            logger.error("IOException: " + ioe.getMessage());
         } catch (AmazonServiceException ase) {
-            logger.info("Caught an AmazonServiceException from GET requests, rejected reasons:");
+            logger.info("sCaught an AmazonServiceException from GET requests, rejected reasons:");
             logger.info("Error Message:    " + ase.getMessage());
             logger.info("HTTP Status Code: " + ase.getStatusCode());
             logger.info("AWS Error Code:   " + ase.getErrorCode());
             logger.info("Error Type:       " + ase.getErrorType());
             logger.info("Request ID:       " + ase.getRequestId());
+            throw ase;
         } catch (AmazonClientException ace) {
             logger.info("Caught an AmazonClientException: ");
             logger.info("Error Message: " + ace.getMessage());
-        } catch (IOException ioe) {
-            logger.info("IOE Error Message: " + ioe.getMessage());
+            throw ace;
         }
 
-        return strBuff.toString();
+        return null;
     }
 
     /**

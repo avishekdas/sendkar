@@ -1,11 +1,11 @@
 package com.sendkar.upload.service;
 
-import com.sendkar.upload.model.DocumentUploadOtp;
+import com.sendkar.upload.exception.ResourceNotFoundException;
+import com.sendkar.upload.model.Document;
 import com.sendkar.upload.model.User;
 import com.sendkar.upload.payload.OtpResponse;
-import com.sendkar.upload.repository.OtpRepository;
+import com.sendkar.upload.repository.DocumentRepository;
 import com.sendkar.upload.repository.UserRepository;
-import com.sendkar.upload.security.UserPrincipal;
 import com.sendkar.upload.util.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,27 +20,26 @@ public class OtpService {
     private static final Logger logger = LoggerFactory.getLogger(OtpService.class);
 
     @Autowired
-    OtpRepository otpRepository;
+    DocumentRepository documentRepository;
 
     @Autowired
     UserRepository userRepository;
 
     @Transactional
-    public OtpResponse generateDocUploadOtp(String username){
+    public OtpResponse generateDocOtp(Long docId){
         OtpResponse otpResponse = null;
-        if(username != null) {
-            User user = userRepository.findByUsernameOrEmail(username, username)
+        if(docId != null) {
+            Document document = documentRepository.findById(docId)
                     .orElseThrow(() ->
-                            new UsernameNotFoundException("User not found with username or email : " + username)
+                            new ResourceNotFoundException("Document", "Document Id", docId)
                     );
-
             char[] otp = StringUtil.generateOTP(4);
             otpResponse = new OtpResponse(String.valueOf(otp));
-
-            DocumentUploadOtp docUploadOtp = new DocumentUploadOtp(username, otpResponse.getOtp());
-
+            if(document != null){
+                document.setOtp(otpResponse.getOtp());
+            }
             //Send otp <TODO>
-            otpRepository.saveAndFlush(docUploadOtp);
+            documentRepository.saveAndFlush(document);
         } else {
             new UsernameNotFoundException("User not found");
         }

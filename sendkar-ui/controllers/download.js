@@ -20,7 +20,7 @@ exports.getDocList = (req, res) => {
 	var string = JSON.stringify(query);
 	var objectValue = JSON.parse(string);
 	
-	console.log(objectValue['receivermobilenumber']);
+	//console.log(objectValue['receivermobilenumber']);
 	if(objectValue['receivermobilenumber'] === '') {
 		const errors = 'Receipient Mobile number missing';
 		if (errors) {
@@ -36,7 +36,7 @@ exports.getDocList = (req, res) => {
 	client.get(docurl, function (data, response) {
 		var resources = [];
 		for(var i = 0; i < data.length; i++) {
-			console.log(data[i].filename);
+			//console.log(data[i].filename);
 			var resource = new Object();
 			resource.id = data[i].id;
 			resource.filename = data[i].filename;
@@ -51,8 +51,6 @@ exports.getDocument = (req, res) => {
 	var string = JSON.stringify(query);
 	var objectValue = JSON.parse(string);
 	
-	console.log(objectValue['docid']);
-    console.log(objectValue['otp']);
 	if(objectValue['docid'] === '') {
 		const errors = 'Receipient Mobile number missing';
 		if (errors) {
@@ -60,13 +58,11 @@ exports.getDocument = (req, res) => {
 			return res.redirect('/download');
 		}
 	}
-  
+    
   	//Call api
 	var docurl = "http://13.232.119.17:8083/api/download/assisted/file/";
     docurl = docurl + objectValue['docid'];
     docurl = docurl + "/" + objectValue['otp'];
-    console.log(docurl);
-	 
 	client.get(docurl, function (data, response) {
         var fileName;
         var contenttype = response.headers['content-type'];
@@ -80,6 +76,29 @@ exports.getDocument = (req, res) => {
 		res.setHeader('Content-Type',contenttype);
 		res.setHeader("Content-Disposition","attachment;filename="+fileName);
 		res.end(data,'binary');
+	});
+};
+
+exports.getOtp = (req, res) => {
+	var query = url.parse(req.url,true).query;
+	var string = JSON.stringify(query);
+	var objectValue = JSON.parse(string);
+	
+	if(objectValue['docid'] === '') {
+		const errors = 'Receipient Mobile number missing';
+		if (errors) {
+			req.flash('errors', errors);
+			return res.redirect('/download');
+		}
+	}
+  
+  	//Call api
+	var docurl = "http://13.232.119.17:8083/api/download/getdocdownloadotp/";
+    docurl = docurl + objectValue['docid'];
+	 
+	client.get(docurl, function (data, response) {
+        //console.log(data);
+        res.send(data);
 	});
 };
 
@@ -108,7 +127,7 @@ exports.postDownload = (req, res) => {
 		//console.log(response);
 		var resources = [];
 		data.forEach(function(doc) {
-			console.log(doc.filename);
+			//console.log(doc.filename);
 			var resource = new Object();
 			resource.id = doc.id;
 			resource.filename = doc.filename;

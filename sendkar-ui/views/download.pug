@@ -48,8 +48,18 @@ block content
                column.append(otpfield);
                tr.append(column);
                
-               //var clickme = $("<input type=\"button\" value=\"Fetch\" name=\"btnFetch\" />");
                var clickme = $('<input />', {
+                  type  : 'button',
+                  value : 'GetOTP',
+                  id    : 'btnOtp',
+                  name  : 'btnOtp',
+                  on    : {
+                     click: function() {
+                         getOtp(data.id);
+                     }
+                  }
+               });
+               var otpme = $('<input />', {
                   type  : 'button',
                   value : 'Fetch',
                   id    : 'btnFetch',
@@ -61,6 +71,7 @@ block content
                   }
                });
                column = $('<td></td>');
+               column.append(otpme);
                column.append(clickme);
                tr.append(column);
                $('#main_table').append(tr);
@@ -78,12 +89,22 @@ block content
             var $tds = $(this).find('td');
             tempdocid = $tds.eq(0).text();
             if(tempdocid.match(docid)) {
-                $(this).closest('tr').find("input:not([name^=btnFetch])").each(function() {
-                    otp = this.value;
-                });
+                otp = $(this).find("td:eq(2) input[type='text']").val();
             }
         });
         
         var docurl = '/getdocument?docid=' + docid + '&otp=' + otp;
         location.href = docurl;
+      }
+      
+      function getOtp(docid) {
+        var docurl = '/getotp?docid=' + docid;
+        $.ajax({
+          type: "GET",
+          url: docurl,
+          dataType:"json",
+          success: (result) => {
+            alert(result.message);
+          }
+       });
       }

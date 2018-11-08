@@ -1,4 +1,4 @@
-package com.sendkar.download.service.aws.s3;
+package com.sendkar.download.service.aws;
 
 import com.amazonaws.AmazonClientException;
 import com.amazonaws.AmazonServiceException;
@@ -116,7 +116,7 @@ public class S3ServicesImpl implements S3Services {
      *  String folderName = "testfolder";
      *  createFolder(bucketName, folderName, s3client);
     */
-    public static void createFolder(String bucketName, String folderName, AmazonS3 client) {
+    public void createFolder(String bucketName, String folderName) {
         // create meta-data for your folder and set content-length to 0
         ObjectMetadata metadata = new ObjectMetadata();
         metadata.setContentLength(0);
@@ -126,7 +126,7 @@ public class S3ServicesImpl implements S3Services {
         PutObjectRequest putObjectRequest = new PutObjectRequest(bucketName,
                 folderName + SUFFIX, emptyContent, metadata);
         // send request to S3 to create folder
-        client.putObject(putObjectRequest);
+        s3client.putObject(putObjectRequest);
     }
 
     /**
@@ -134,12 +134,12 @@ public class S3ServicesImpl implements S3Services {
      * folder itself
      * deleteFolder(bucketName, folderName, s3client);
      */
-    public static void deleteFolder(String bucketName, String folderName, AmazonS3 client) {
+    public void deleteFolder(String bucketName, String folderName) {
         List<S3ObjectSummary> fileList =
-                client.listObjects(bucketName, folderName).getObjectSummaries();
+                s3client.listObjects(bucketName, folderName).getObjectSummaries();
         for (S3ObjectSummary file : fileList) {
-            client.deleteObject(bucketName, file.getKey());
+            s3client.deleteObject(bucketName, file.getKey());
         }
-        client.deleteObject(bucketName, folderName);
+        s3client.deleteObject(bucketName, folderName);
     }
 }

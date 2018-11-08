@@ -1,4 +1,4 @@
-package com.sendkar.download.service.aws.s3;
+package com.sendkar.download.service.aws;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;

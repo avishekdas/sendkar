@@ -3,14 +3,14 @@ package com.sendkar.download.controller;
 import com.sendkar.download.converters.DocumentToDocumentResponse;
 import com.sendkar.download.exception.ResourceNotFoundException;
 import com.sendkar.download.model.Document;
+import com.sendkar.download.payload.ApiResponse;
 import com.sendkar.download.payload.DocumentResponse;
-import com.sendkar.download.payload.OtpResponse;
 import com.sendkar.download.payload.DownloadFileResponse;
 import com.sendkar.download.repository.DocumentRepository;
 import com.sendkar.download.security.CurrentUser;
 import com.sendkar.download.security.UserPrincipal;
 import com.sendkar.download.service.OtpService;
-import com.sendkar.download.service.aws.s3.S3Services;
+import com.sendkar.download.service.aws.S3Services;
 import com.sendkar.download.util.Utility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -153,11 +153,7 @@ public class FileController {
 
     @GetMapping("/download/getdocdownloadotp/{id}")
 //    @PreAuthorize("hasRole('USER')")
-    public OtpResponse getMobileOtp(@PathVariable Long id) {
-        //Fetch plan details
-        String planName = "default-plan";
-        //Validate plan <TODO>
-        OtpResponse otpResponse = optSrvc.generateDocOtp(id);
-        return otpResponse;
+    public ApiResponse getMobileOtp(@PathVariable Long id) {
+        return optSrvc.generateDocOtp(id);
     }
 }

@@ -23,9 +23,9 @@ block content
       .col-md-8
         input.form-control(type='text', name='receiveraddress', id='receiveraddress')
     .form-group.row
-      label(class='col-md-2 col-form-label font-weight-bold', for='file') Document
-      .col-md-6
-        input.form-control(type='file', name='file', id='file')
+      label(class='col-md-2 col-form-label font-weight-bold', for='file') Select Document
+      .col-md-8
+        input#file.inputfile.inputfile-4(type='file', name='file', data-multiple-caption='{count} files selected')
     .form-group.row
       label(class='col-md-2 col-form-label font-weight-bold', for='message') Message for recipient if any
       .col-md-8

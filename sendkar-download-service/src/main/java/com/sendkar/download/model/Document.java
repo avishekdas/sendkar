@@ -40,6 +40,10 @@ public class Document extends DateAudit {
     @Size(max = 200)
     private String message;
 
+    private int pagecount;
+
+    private int downloadcount;
+
     public Document() {
     }
 
@@ -47,7 +51,8 @@ public class Document extends DateAudit {
                     @NotBlank @Size(max = 100) String filename, @Size(max = 4)
             String otp, @NotNull(message = "Please enter sender mobile number")
                             Long sendermobilenumber, @NotNull(message = "Please enter receiver mobile number")
-                            Long receivermobilenumber, @NotBlank String senderaddress, @NotBlank String receiveraddress, String message) {
+                            Long receivermobilenumber, @NotBlank String senderaddress, @NotBlank String receiveraddress,
+                    String message, int pagecount, int downloadcount) {
         this.uploadername = uploadername;
         this.filename = filename;
         this.otp = otp;
@@ -56,6 +61,8 @@ public class Document extends DateAudit {
         this.senderaddress = senderaddress;
         this.receiveraddress = receiveraddress;
         this.message = message;
+        this.pagecount = pagecount;
+        this.downloadcount = downloadcount;
     }
 
     public Long getId() {
@@ -128,5 +135,21 @@ public class Document extends DateAudit {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public int getPagecount() {
+        return pagecount;
+    }
+
+    public void setPagecount(int pagecount) {
+        this.pagecount = pagecount;
+    }
+
+    public int getDownloadcount() {
+        return downloadcount;
+    }
+
+    public void setDownloadcount(int downloadcount) {
+        this.downloadcount = downloadcount;
     }
 }

@@ -119,6 +119,11 @@ public class FileController {
 
             ByteArrayOutputStream downloadInputStream = s3Srvc.downloadFile(strBuff.toString());
 
+            int downloadCount = document.getDownloadcount();
+            downloadCount = downloadCount + 1;
+            document.setDownloadcount(downloadCount);
+            documentRepository.saveAndFlush(document);
+
             return ResponseEntity.ok()
                     .contentType(contentType(strBuff.toString()))
                     .header(HttpHeaders.CONTENT_DISPOSITION,"attachment; filename=\"" + strBuff.toString() + "\"")

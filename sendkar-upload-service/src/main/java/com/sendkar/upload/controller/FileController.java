@@ -8,6 +8,7 @@ import com.sendkar.upload.security.CurrentUser;
 import com.sendkar.upload.security.UserPrincipal;
 import com.sendkar.upload.service.OtpService;
 import com.sendkar.upload.service.aws.s3.S3Services;
+import com.sendkar.upload.util.PdfUtil;
 import com.sendkar.upload.util.StringUtil;
 import com.sendkar.upload.util.Utility;
 import org.slf4j.Logger;
@@ -30,7 +31,8 @@ public class FileController {
     private static final Logger logger = LoggerFactory.getLogger(FileController.class);
 
     @Autowired
-    private DocumentRepository documentRepository;
+    private DocumentRepository documentRepository
+            ;
 
     @Autowired
     private S3Services s3Srvc;
@@ -103,12 +105,14 @@ public class FileController {
                 strBuff.append(fileName);
                 s3Srvc.uploadFile(strBuff.toString(), file);
 
+                int pagePdfCount = PdfUtil.efficientPDFPageCount(file);
+
                 Long sendermobilenumberLong = Long.parseLong(sendermobilenumber);
                 Long receivermobilenumberLong = Long.parseLong(receivermobilenumber);
 
                 Document document = new Document(uploadername, multipartFile.getOriginalFilename(), otp.toString(),
                         sendermobilenumberLong, receivermobilenumberLong,
-                        senderaddress, receiveraddress, message);
+                        senderaddress, receiveraddress, message, pagePdfCount, 0);
 
                 documentRepository.saveAndFlush(document);
 

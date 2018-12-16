@@ -13,8 +13,7 @@ public class PdfUtil {
 
     public static int efficientPDFPageCount(File file) throws IOException {
         ContentInfoUtil util = new ContentInfoUtil();
-        File possiblePdfFile = new File("/path/to/possiblePdfFile.pdf");
-        ContentInfo info = util.findMatch(possiblePdfFile);
+        ContentInfo info = util.findMatch(file);
         int count = 0;
         if(ContentType.PDF.equals(info.getContentType())) {
             PDDocument doc = PDDocument.load(file);

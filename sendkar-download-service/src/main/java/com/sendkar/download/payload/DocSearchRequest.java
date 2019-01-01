@@ -1,10 +1,7 @@
 package com.sendkar.download.payload;
 
-import com.sendkar.download.model.DocDownloadDtls;
+public class DocSearchRequest {
 
-import java.util.List;
-
-public class DocumentResponse {
     private Long id;
     private String uploadername;
     private String filename;
@@ -14,23 +11,6 @@ public class DocumentResponse {
     private String senderaddress;
     private String receiveraddress;
     private String message;
-
-    private List<DocDownloadDtls> docDownloadDtlsList;
-
-    public DocumentResponse() {
-    }
-
-    public DocumentResponse(Long id, String uploadername, String filename, String otp, Long sendermobilenumber, Long receivermobilenumber, String senderaddress, String receiveraddress, String message) {
-        this.id = id;
-        this.uploadername = uploadername;
-        this.filename = filename;
-        this.otp = otp;
-        this.sendermobilenumber = sendermobilenumber;
-        this.receivermobilenumber = receivermobilenumber;
-        this.senderaddress = senderaddress;
-        this.receiveraddress = receiveraddress;
-        this.message = message;
-    }
 
     public Long getId() {
         return id;
@@ -102,13 +82,5 @@ public class DocumentResponse {
 
     public void setMessage(String message) {
         this.message = message;
-    }
-
-    public List<DocDownloadDtls> getDocDownloadDtlsList() {
-        return docDownloadDtlsList;
-    }
-
-    public void setDocDownloadDtlsList(List<DocDownloadDtls> docDownloadDtlsList) {
-        this.docDownloadDtlsList = docDownloadDtlsList;
     }
 }

@@ -1,14 +1,16 @@
 package com.sendkar.download.controller;
 
+import com.sendkar.download.converters.DocDownloadDtlsToDocDownloadResponse;
 import com.sendkar.download.converters.DocumentToDocumentResponse;
 import com.sendkar.download.exception.ResourceNotFoundException;
+import com.sendkar.download.model.DocDownloadDtls;
 import com.sendkar.download.model.Document;
-import com.sendkar.download.payload.ApiResponse;
-import com.sendkar.download.payload.DocumentResponse;
-import com.sendkar.download.payload.DownloadFileResponse;
+import com.sendkar.download.payload.*;
+import com.sendkar.download.repository.DocDownloadDtlsRepository;
 import com.sendkar.download.repository.DocumentRepository;
 import com.sendkar.download.security.CurrentUser;
 import com.sendkar.download.security.UserPrincipal;
+import com.sendkar.download.service.DocumentService;
 import com.sendkar.download.service.OtpService;
 import com.sendkar.download.service.aws.S3Services;
 import com.sendkar.download.util.Utility;
@@ -16,15 +18,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import javax.validation.Valid;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -40,10 +46,19 @@ public class FileController {
     private DocumentRepository documentRepository;
 
     @Autowired
+    private DocDownloadDtlsRepository docDownloadDtlsRepository;
+
+    @Autowired
     private DocumentToDocumentResponse docToDocResponseConvertor;
 
     @Autowired
+    private DocDownloadDtlsToDocDownloadResponse docDownloadToDocDownloadResponseConvertor;
+
+    @Autowired
     private S3Services s3Srvc;
+
+    @Autowired
+    private DocumentService docSrvc;
 
     @Autowired
     private OtpService optSrvc;
@@ -97,10 +112,11 @@ public class FileController {
                 .collect(Collectors.toList());
     }*/
 
-    @GetMapping("/download/assisted/file/{id}/{otp}")
+    @GetMapping("/download/assisted/file/{id}/{otp}/{username}")
 //    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<byte[]> downloadFileAssisted(@PathVariable Long id,
-                                                       @PathVariable String otp) {
+                                                       @PathVariable String otp,
+                                                       @PathVariable String username) {
         Document document = documentRepository.findById(id)
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Document Id not found", "id", id)
@@ -123,6 +139,11 @@ public class FileController {
             downloadCount = downloadCount + 1;
             document.setDownloadcount(downloadCount);
             documentRepository.saveAndFlush(document);
+
+            DocDownloadDtls docDownload = new DocDownloadDtls();
+            docDownload.setDocid(document.getId());
+            docDownload.setUsername(username);
+            docDownloadDtlsRepository.saveAndFlush(docDownload);
 
             return ResponseEntity.ok()
                     .contentType(contentType(strBuff.toString()))
@@ -156,9 +177,43 @@ public class FileController {
         return docRespList;
     }
 
+    @GetMapping("/download/getdocdownloadlist/{id}")
+    public List<DocDownloadResponse> getDocDownloadMapList(@PathVariable Long id) {
+        List<DocDownloadResponse> docDownloadRespList = new ArrayList<DocDownloadResponse>();
+        List<DocDownloadDtls> documentDownloadMapList = docDownloadDtlsRepository.findByDocid(id);
+
+        for (DocDownloadDtls docDownloadDtls : documentDownloadMapList
+        ) {
+            docDownloadRespList.add(docDownloadToDocDownloadResponseConvertor.convert(docDownloadDtls));
+        }
+
+        return docDownloadRespList;
+    }
+
     @GetMapping("/download/getdocdownloadotp/{id}")
 //    @PreAuthorize("hasRole('USER')")
     public ApiResponse getMobileOtp(@PathVariable Long id) {
         return optSrvc.generateDocOtp(id);
+    }
+
+    @PostMapping("/download/search")
+    public ResponseEntity<?> authenticateUser(@Valid @RequestBody DocSearchRequest searchRequest) {
+
+        List<DocumentResponse> docRespList = docSrvc.searchDocument(searchRequest);
+
+
+//        URI location = ServletUriComponentsBuilder
+//                .fromCurrentContextPath().path("/download/getDocument/{id}")
+//                .buildAndExpand(result.getUsername()).toUri();
+
+        return new ResponseEntity<Object>(docRespList, HttpStatus.OK);
+    }
+
+    @GetMapping("/download/getDocument/{id}")
+    //@PreAuthorize("hasRole('USER')")
+    public DocumentResponse getUserDetails(@PathVariable Long id) {
+
+        DocumentResponse docResponse = docSrvc.getDocumentDtls(id);
+        return docResponse;
     }
 }

@@ -36,10 +36,9 @@ exports.getSearchDoc = (req, res) => {
     console.log(args);
     
 	client.post(docurl, args, function (data, response) {
-        console.log(data);
-		var resources = [];
+        var resources = [];
 		for(var i = 0; i < data.length; i++) {
-			console.log(data[i]);
+			resources.push(data[i]);
 		};
 		res.send(JSON.stringify(resources));
 	});

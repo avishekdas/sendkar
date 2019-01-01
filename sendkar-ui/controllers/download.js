@@ -30,7 +30,7 @@ exports.getDocList = (req, res) => {
 	}
   
   	//Call api
-	var docurl = "http://13.232.119.17:8083/api/download/getdocumentlist/";
+	var docurl = "http://13.232.6.150:8083/api/download/getdocumentlist/";
     docurl = docurl + objectValue['receivermobilenumber'];
 	 
 	client.get(docurl, function (data, response) {
@@ -61,7 +61,7 @@ exports.searchDoc = (req, res) => {
 	}
   
   	//Call api
-	var docurl = "http://13.232.119.17:8083/api/download/getdocumentlist/";
+	var docurl = "http://13.232.6.150:8083/api/download/getdocumentlist/";
     docurl = docurl + objectValue['receivermobilenumber'];
 	 
 	client.get(docurl, function (data, response) {
@@ -91,7 +91,7 @@ exports.getDocument = (req, res) => {
 	}
     
   	//Call api
-	var docurl = "http://13.232.119.17:8083/api/download/assisted/file/";
+	var docurl = "http://13.232.6.150:8083/api/download/assisted/file/";
     docurl = docurl + objectValue['docid'];
     docurl = docurl + "/" + objectValue['otp'];
 	client.get(docurl, function (data, response) {
@@ -124,7 +124,7 @@ exports.getOtp = (req, res) => {
 	}
   
   	//Call api
-	var docurl = "http://13.232.119.17:8083/api/download/getdocdownloadotp/";
+	var docurl = "http://13.232.6.150:8083/api/download/getdocdownloadotp/";
     docurl = docurl + objectValue['docid'];
 	 
 	client.get(docurl, function (data, response) {
@@ -149,7 +149,7 @@ exports.postDownload = (req, res) => {
   }
   
   	//Call api
-	var docurl = "http://13.232.119.17:8083/api/download/getdocumentlist/";
+	var docurl = "http://13.232.6.150:8083/api/download/getdocumentlist/";
     docurl = docurl + req.body.receivermobilenumber;
 	 
 	client.get(docurl, function (data, response) {

@@ -56,7 +56,7 @@ exports.postUpload = (req, res) => {
         };
 
         request.post({
-            url: 'http://13.232.6.150:8082/api/upload/assisted/file',
+            url: 'http://172.31.6.104:8082/api/upload/assisted/file',
             formData: formData
         });
     });

@@ -25,13 +25,7 @@ exports.getSearchDoc = (req, res) => {
     var args = {
 		data: {
 			"id" : objectValue['id'],
-			"uploadername" : objectValue['uploadername'],
-			"filename" : objectValue['filename'],
-			"sendermobilenumber" : objectValue['sendernum'],
-			"receivermobilenumber" : objectValue['receivernum'],
-            "senderaddress" : objectValue['sendaddr'],
-			"receiveraddress" : objectValue['receiveraddr'],
-			"message" : objectValue['message']
+			"filename" : objectValue['filename']
 		},
 		headers: { "Content-Type": "application/json" }
 	};

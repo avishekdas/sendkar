@@ -39,6 +39,8 @@ exports.getSearchDoc = (req, res) => {
   	//Call api
 	var docurl = "http://172.31.6.104:8083/api/download/search";
     
+    console.log(args);
+    
 	client.post(docurl, args, function (data, response) {
         console.log(data);
 		var resources = [];

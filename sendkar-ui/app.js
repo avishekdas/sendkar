@@ -149,6 +149,7 @@ app.get('/getdocument', passportConfig.isAuthenticated, downloadController.getDo
 app.get('/searchdocument', passportConfig.isAuthenticated, downloadController.searchDoc);
 app.get('/getotp', passportConfig.isAuthenticated, downloadController.getOtp);
 app.post('/download', passportConfig.isAuthenticated, downloadController.postDownload);
+app.get('/search', passportConfig.isAuthenticated, downloadController.getDownload);
 app.post('/search', passportConfig.isAuthenticated, searchController.postSearch);
 app.get('/account', passportConfig.isAuthenticated, userController.getAccount);
 app.post('/account/profile', passportConfig.isAuthenticated, userController.postUpdateProfile);

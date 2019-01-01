@@ -81,7 +81,7 @@ block content
                var userStr = '';
                $.each(data.docDownloadDtlsList, function( key, value ) {
                  userStr += value.username + '\n';
-               }
+               })
                tr.append("<td>" + userStr + "</td>");
                
                $('#main_table').append(tr);

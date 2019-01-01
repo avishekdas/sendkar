@@ -2,6 +2,19 @@ const Client = require('node-rest-client').Client;
 var client = new Client();
 var url = require('url');
 
+/**
+ * GET /download
+ * Contact form page.
+ */
+exports.getSearch = (req, res) => {
+  const unknownUser = !(req.user);
+
+  res.render('search', {
+    title: 'Search',
+    unknownUser,
+  });
+};
+
 exports.postSearch = (req, res) => {
 	var query = url.parse(req.url,true).query;
 	var string = JSON.stringify(query);

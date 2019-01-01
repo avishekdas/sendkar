@@ -55,7 +55,7 @@ block content
         $('#main_table').prop('hidden', false);
         $("#main_table").find("tr").remove();
         
-        var docurl = '/searchDocDownload?id=' + $("#id").val() + '&filename=' + $("#filename").val() + '&sendernum=' + $("#sendermobilenumber").val() + '&receivernum=' + $("#receivermobilenumber").val() + '&sendaddr=' + $("#senderaddress").val() + '&receiveraddr=' + $("#receiveraddress").val() + '&message' + $("#message").val();
+        var docurl = '/searchDocDownload?id=' + $("#id").val() + '&uploadername=' + '&filename=' + $("#filename").val() + '&sendernum=' + $("#sendermobilenumber").val() + '&receivernum=' + $("#receivermobilenumber").val() + '&sendaddr=' + $("#senderaddress").val() + '&receiveraddr=' + $("#receiveraddress").val() + '&message' + $("#message").val();
         $.ajax({
           type: "GET",
           url: docurl,

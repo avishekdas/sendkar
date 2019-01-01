@@ -21,9 +21,13 @@ block content
       .col-md-2
         input.form-control(type='number', name='receivermobilenumber', id='receivermobilenumber', pattern='[1-9]{12}')
     .form-group.row
+      label(class='col-md-2 col-form-label font-weight-bold', for='uploadername') Uploader Name
+      .col-md-8
+        input.form-control(type='text', name='uploadername', id='uploadername')
+    .form-group.row
       label(class='col-md-2 col-form-label font-weight-bold', for='senderaddress') Sender Address
       .col-md-8
-        input.form-control(type='text', name='senderaddress', id='senderaddress', autocomplete='senderaddress')
+        input.form-control(type='text', name='senderaddress', id='senderaddress')
     .form-group.row
       label(class='col-md-2 col-form-label font-weight-bold', for='receiveraddress') Recipient Address
       .col-md-8
@@ -51,24 +55,11 @@ block content
         $('#main_table').prop('hidden', false);
         $("#main_table").find("tr").remove();
         
-        var jsonObj = {};
-        jsonObj.id = $("#id").val();
-        jsonObj.filename = $("#filename").val();
-        jsonObj.sendermobilenumber = $("#sendermobilenumber").val();
-        jsonObj.receivermobilenumber = $("#receivermobilenumber").val();
-        jsonObj.senderaddress = $("#senderaddress").val();
-        jsonObj.receiveraddress = $("#receiveraddress").val();
-        jsonObj.message = $("#message").val();
-        
-        var jsondata = "";
-        jsondata = JSON.stringify(jsonObj);
-        
-        var docurl = '/search';
+        var docurl = '/searchDocDownload?id=' + $("#id").val() + '&filename=' + $("#filename").val() + '&sendernum=' + $("#sendermobilenumber").val() + '&receivernum=' + $("#receivermobilenumber").val() + '&sendaddr=' + $("#senderaddress").val() + '&receiveraddr=' + $("#receiveraddress").val() + '&message' + $("#message").val();
         $.ajax({
+          type: "GET",
           url: docurl,
-          contentType : "application/json",
-          type: "POST",
-          data: jsondata,
+          dataType:"json",
           success: (result) => {
             if(result.indexOf("Un-authorize") === -1){
               $.each(result, function( key, data ) {

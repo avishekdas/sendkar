@@ -15,7 +15,7 @@ exports.getSearch = (req, res) => {
   });
 };
 
-exports.postSearch = (req, res) => {
+exports.getSearchDoc = (req, res) => {
 	var query = url.parse(req.url,true).query;
 	var string = JSON.stringify(query);
 	var objectValue = JSON.parse(string);
@@ -27,10 +27,10 @@ exports.postSearch = (req, res) => {
 			id : objectValue['id'],
 			uploadername : objectValue['uploadername'],
 			filename : objectValue['filename'],
-			sendermobilenumber : objectValue['sendermobilenumber'],
-			receivermobilenumber: objectValue['receivermobilenumber'],
-            senderaddress : objectValue['senderaddress'],
-			receiveraddress : objectValue['receiveraddress'],
+			sendermobilenumber : objectValue['sendernum'],
+			receivermobilenumber: objectValue['receivernum'],
+            senderaddress : objectValue['sendaddr'],
+			receiveraddress : objectValue['receiveraddr'],
 			message: objectValue['message']
 		},
 		headers: { "Content-Type": "application/json" }

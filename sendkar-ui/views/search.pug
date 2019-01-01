@@ -10,18 +10,16 @@ block content
       label(class='col-md-2 col-form-label font-weight-bold', for='id') Document Id
       .col-md-2
         input.form-control(type='number', name='id', id='id', autofocus=true)
-    .form-group.row
-      label(class='col-md-2 col-form-label font-weight-bold', for='filename') Document Id
+      label(class='col-md-2 col-form-label font-weight-bold', for='filename') File Name
       .col-md-2
-        input.form-control(type='number', name='filename', id='filename', autofocus=true)
+        input.form-control(type='text', name='filename', id='filename', autofocus=true)
     .form-group.row
       label(class='col-md-2 col-form-label font-weight-bold', for='sendermobilenumber') Sender Mobile #
       .col-md-2
-        input.form-control(type='number', name='sendermobilenumber', id='sendermobilenumber', autofocus=true)
-    .form-group.row
+        input.form-control(type='number', name='sendermobilenumber', id='sendermobilenumber', pattern='[1-9]{12}')
       label(class='col-md-2 col-form-label font-weight-bold', for='receivermobilenumber') Recipient Mobile #
       .col-md-2
-        input.form-control(type='text', name='receivermobilenumber', id='receivermobilenumber', pattern='[1-9]{12}')
+        input.form-control(type='number', name='receivermobilenumber', id='receivermobilenumber', pattern='[1-9]{12}')
     .form-group.row
       label(class='col-md-2 col-form-label font-weight-bold', for='senderaddress') Sender Address
       .col-md-8

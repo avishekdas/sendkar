@@ -44,7 +44,7 @@ block content
     script(src="/js/jquery-3.3.1.min.js")
     script(type="text/javascript").
       $(document).ready( () => {
-        var th = '<th>Document Id</th><th>Document Name</th><th>Enter OTP</th><th>Action</th>';
+        var th = '<th>Document Id</th><th>Document Name</th><th>Page Count</th><th>Download Count</th><th>Downloader user name</th>';
         $('#main_table').append(th);
         $("#btnSubmit").click((event) => {
           searchDocuments();

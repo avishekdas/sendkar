@@ -14,13 +14,18 @@ public class DocumentResponse {
     private String senderaddress;
     private String receiveraddress;
     private String message;
+    private Integer pagecount;
+    private Integer downloadcount;
 
     private List<DocDownloadDtls> docDownloadDtlsList;
 
     public DocumentResponse() {
     }
 
-    public DocumentResponse(Long id, String uploadername, String filename, String otp, Long sendermobilenumber, Long receivermobilenumber, String senderaddress, String receiveraddress, String message) {
+    public DocumentResponse(Long id, String uploadername, String filename, String otp,
+                            Long sendermobilenumber, Long receivermobilenumber,
+                            String senderaddress, String receiveraddress, String message,
+                            Integer pagecount, Integer downloadcount) {
         this.id = id;
         this.uploadername = uploadername;
         this.filename = filename;
@@ -30,6 +35,8 @@ public class DocumentResponse {
         this.senderaddress = senderaddress;
         this.receiveraddress = receiveraddress;
         this.message = message;
+        this.pagecount = pagecount;
+        this.downloadcount = downloadcount;
     }
 
     public Long getId() {
@@ -102,6 +109,22 @@ public class DocumentResponse {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public Integer getPagecount() {
+        return pagecount;
+    }
+
+    public void setPagecount(Integer pagecount) {
+        this.pagecount = pagecount;
+    }
+
+    public Integer getDownloadcount() {
+        return downloadcount;
+    }
+
+    public void setDownloadcount(Integer downloadcount) {
+        this.downloadcount = downloadcount;
     }
 
     public List<DocDownloadDtls> getDocDownloadDtlsList() {

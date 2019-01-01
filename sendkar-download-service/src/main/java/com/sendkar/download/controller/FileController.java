@@ -200,12 +200,6 @@ public class FileController {
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody DocSearchRequest searchRequest) {
 
         List<DocumentResponse> docRespList = docSrvc.searchDocument(searchRequest);
-
-
-//        URI location = ServletUriComponentsBuilder
-//                .fromCurrentContextPath().path("/download/getDocument/{id}")
-//                .buildAndExpand(result.getUsername()).toUri();
-
         return new ResponseEntity<Object>(docRespList, HttpStatus.OK);
     }
 

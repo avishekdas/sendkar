@@ -13,7 +13,8 @@ public class DocumentToDocumentResponse implements Converter<Document, DocumentR
         DocumentResponse docResponse = new DocumentResponse(
                 document.getId(), document.getUploadername(), document.getFilename(), document.getOtp(),
                 document.getSendermobilenumber(), document.getReceivermobilenumber(),
-                document.getSenderaddress(), document.getReceiveraddress(), document.getMessage()
+                document.getSenderaddress(), document.getReceiveraddress(), document.getMessage(),
+                document.getPagecount(),document.getDownloadcount()
         );
         return docResponse;
     }

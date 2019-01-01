@@ -37,6 +37,7 @@ const apiController = require('./controllers/api');
 const contactController = require('./controllers/contact');
 const uploadController = require('./controllers/upload');
 const downloadController = require('./controllers/download');
+const searchController = require('./controllers/search');
 
 /**
  * API keys and Passport configuration.
@@ -148,6 +149,8 @@ app.get('/getdocument', passportConfig.isAuthenticated, downloadController.getDo
 app.get('/searchdocument', passportConfig.isAuthenticated, downloadController.searchDoc);
 app.get('/getotp', passportConfig.isAuthenticated, downloadController.getOtp);
 app.post('/download', passportConfig.isAuthenticated, downloadController.postDownload);
+app.post('/search', passportConfig.isAuthenticated, searchController.postSearch);
+app.post('/fetchDownloadResult', passportConfig.isAuthenticated, searchController.postDownloadResult);
 app.get('/account', passportConfig.isAuthenticated, userController.getAccount);
 app.post('/account/profile', passportConfig.isAuthenticated, userController.postUpdateProfile);
 app.post('/account/password', passportConfig.isAuthenticated, userController.postUpdatePassword);

@@ -1,0 +1,94 @@
+extends layout
+
+block content
+  .pb-2.mt-2.mb-4.border-bottom
+    h3 Search Document
+
+  form(enctype='multipart/mixed', method='POST', id="applicationForm")
+    input(type='hidden', name='_csrf', value=_csrf)
+    .form-group.row
+      label(class='col-md-2 col-form-label font-weight-bold', for='id') Document Id
+      .col-md-2
+        input.form-control(type='number', name='id', id='id', autofocus=true)
+    .form-group.row
+      label(class='col-md-2 col-form-label font-weight-bold', for='filename') Document Id
+      .col-md-2
+        input.form-control(type='number', name='filename', id='filename', autofocus=true)
+    .form-group.row
+      label(class='col-md-2 col-form-label font-weight-bold', for='sendermobilenumber') Sender Mobile #
+      .col-md-2
+        input.form-control(type='number', name='sendermobilenumber', id='sendermobilenumber', autofocus=true)
+    .form-group.row
+      label(class='col-md-2 col-form-label font-weight-bold', for='receivermobilenumber') Recipient Mobile #
+      .col-md-2
+        input.form-control(type='text', name='receivermobilenumber', id='receivermobilenumber', pattern='[1-9]{12}')
+    .form-group.row
+      label(class='col-md-2 col-form-label font-weight-bold', for='senderaddress') Sender Address
+      .col-md-8
+        input.form-control(type='text', name='senderaddress', id='senderaddress', autocomplete='senderaddress')
+    .form-group.row
+      label(class='col-md-2 col-form-label font-weight-bold', for='receiveraddress') Recipient Address
+      .col-md-8
+        input.form-control(type='text', name='receiveraddress', id='receiveraddress')
+    .form-group.row
+      label(class='col-md-2 col-form-label font-weight-bold', for='message') Message for recipient if any
+      .col-md-8
+        textarea.form-control(name='message', id='message', rows='4')
+    .form-group
+      .offset-md-2.col-md-8.p-1
+        input#btnSubmit.button(name='btnSubmit', type='button', value='Search')
+    table#main_table(align='center', border='1', hidden='')
+
+    script(src="/js/jquery-3.3.1.min.js")
+    script(type="text/javascript").
+      $(document).ready( () => {
+        var th = '<th>Document Id</th><th>Document Name</th><th>Enter OTP</th><th>Action</th>';
+        $('#main_table').append(th);
+        $("#btnSubmit").click((event) => {
+          searchDocuments();
+        });
+      });
+	  
+      function searchDocuments() {
+        $('#main_table').prop('hidden', false);
+        $("#main_table").find("tr").remove();
+        
+        var jsonObj = {};
+        jsonObj.id = $("#id").val();
+        jsonObj.filename = $("#filename").val();
+        jsonObj.sendermobilenumber = $("#sendermobilenumber").val();
+        jsonObj.receivermobilenumber = $("#receivermobilenumber").val();
+        jsonObj.senderaddress = $("#senderaddress").val();
+        jsonObj.receiveraddress = $("#receiveraddress").val();
+        jsonObj.message = $("#message").val();
+        
+        var jsondata = "";
+        jsondata = JSON.stringify(jsonObj);
+        
+        var docurl = '/search';
+        $.ajax({
+          url: docurl,
+          contentType : "application/json",
+          type: "POST",
+          data: jsondata,
+          success: (result) => {
+            if(result.indexOf("Un-authorize") === -1){
+              $.each(result, function( key, data ) {
+               tr = $('<tr/>');
+               tr.append("<td>" + data.id + "</td>");
+               tr.append("<td>" + data.filename + "</td>");
+               tr.append("<td>" + data.pagecount + "</td>");
+               tr.append("<td>" + data.downloadcount + "</td>");
+               
+               var userStr = '';
+               $.each(data.docDownloadDtlsList, function( key, value ) {
+                 userStr += value.username + '\n';
+               }
+               tr.append("<td>" + userStr + "</td>");
+               
+               $('#main_table').append(tr);
+              })
+            }
+        }
+       });
+      }

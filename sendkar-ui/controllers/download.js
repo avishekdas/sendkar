@@ -94,6 +94,8 @@ exports.getDocument = (req, res) => {
 	var docurl = "http://172.31.6.104:8083/api/download/assisted/file/";
     docurl = docurl + objectValue['docid'];
     docurl = docurl + "/" + objectValue['otp'];
+    docurl = docurl + "/" + req.user.email;
+
 	client.get(docurl, function (data, response) {
         var fileName;
         var contenttype = response.headers['content-type'];

@@ -46,6 +46,37 @@ exports.getDocList = (req, res) => {
 	});
 };
 
+exports.searchDoc = (req, res) => {
+	var query = url.parse(req.url,true).query;
+	var string = JSON.stringify(query);
+	var objectValue = JSON.parse(string);
+	
+	//console.log(objectValue['receivermobilenumber']);
+	if(objectValue['receivermobilenumber'] === '') {
+		const errors = 'Receipient Mobile number missing';
+		if (errors) {
+			req.flash('errors', errors);
+			return res.redirect('/download');
+		}
+	}
+  
+  	//Call api
+	var docurl = "http://13.232.119.17:8083/api/download/getdocumentlist/";
+    docurl = docurl + objectValue['receivermobilenumber'];
+	 
+	client.get(docurl, function (data, response) {
+		var resources = [];
+		for(var i = 0; i < data.length; i++) {
+			//console.log(data[i].filename);
+			var resource = new Object();
+			resource.id = data[i].id;
+			resource.filename = data[i].filename;
+			resources.push(resource);		
+		};
+		res.send(JSON.stringify(resources));
+	});
+};
+
 exports.getDocument = (req, res) => {
 	var query = url.parse(req.url,true).query;
 	var string = JSON.stringify(query);
@@ -104,7 +135,6 @@ exports.getOtp = (req, res) => {
 
 /**
  * POST /download
- * Send a contact form via Nodemailer.
  */
 exports.postDownload = (req, res) => {
   if (!req.user) {

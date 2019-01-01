@@ -145,6 +145,7 @@ app.post('/upload', passportConfig.isAuthenticated, upload.single('file'), uploa
 app.get('/download', passportConfig.isAuthenticated, downloadController.getDownload);
 app.get('/getdocuments', passportConfig.isAuthenticated, downloadController.getDocList);
 app.get('/getdocument', passportConfig.isAuthenticated, downloadController.getDocument);
+app.get('/searchdocument', passportConfig.isAuthenticated, downloadController.searchDoc);
 app.get('/getotp', passportConfig.isAuthenticated, downloadController.getOtp);
 app.post('/download', passportConfig.isAuthenticated, downloadController.postDownload);
 app.get('/account', passportConfig.isAuthenticated, userController.getAccount);
